@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repo contains a drop-in CMake buildsystem for the osqp-matlab bindings mantained at .
+This repo contains a drop-in CMake buildsystem for the osqp-matlab bindings mantained at https://github.com/oxfordcontrol/osqp-matlab .
 
 **If you are just interested in using OSQP in MATLAB, please follow the official instructions at https://osqp.org/docs/get_started/matlab.html.**
 
