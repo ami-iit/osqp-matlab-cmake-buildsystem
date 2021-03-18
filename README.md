@@ -20,7 +20,7 @@ How to use this repo
 2. Clone the repository
 
 ~~~
-git clone git://github.com/dic-iit/osqp-matlab-cmake-buildsystem
+git clone https://github.com/dic-iit/osqp-matlab-cmake-buildsystem.git
 ~~~
 
 3. Build it
