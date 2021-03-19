@@ -78,7 +78,8 @@ if(OSQP_MATLAB_USES_MATLAB)
       NAME osqp_mex_matlab
       OUTPUT_NAME osqp_mex
       SRC ${MEX_FILES}
-    LINK_TO ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY} qdldl::qdldl osqp::osqp)
+      NO_IMPLICIT_LINK_TO_MATLAB_LIBRARIES
+      LINK_TO ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY} qdldl::qdldl osqp::osqp)
   # Workaround for missing include https://github.com/oxfordcontrol/osqp-matlab/issues/27
   target_include_directories(osqp_mex_matlab PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/workaround_include)
   install(
