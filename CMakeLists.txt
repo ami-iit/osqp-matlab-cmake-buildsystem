@@ -30,6 +30,7 @@ set(OSQP_MATLAB_INSTALL_OCTAVE_MFILESDIR "octave" CACHE
     STRING "Location (relative to the install prefix) in which the Octave .m files are installed.")
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ycm-0.12)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/cmake-proposed)
 
 # Enable RPATH support for installed binaries and libraries
 include(AddInstallRPATHSupport)
@@ -77,7 +78,7 @@ if(OSQP_MATLAB_USES_MATLAB)
       NAME osqp_mex_matlab
       OUTPUT_NAME osqp_mex
       SRC ${MEX_FILES}
-    LINK_TO qdldl::qdldl osqp::osqp)
+    LINK_TO ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY} qdldl::qdldl osqp::osqp)
   # Workaround for missing include https://github.com/oxfordcontrol/osqp-matlab/issues/27
   target_include_directories(osqp_mex_matlab PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/workaround_include)
   install(
