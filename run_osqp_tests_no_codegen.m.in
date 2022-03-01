@@ -1,0 +1,22 @@
+import matlab.unittest.TestSuite;
+import matlab.unittest.selectors.HasSharedTestFixture;
+import matlab.unittest.selectors.HasName;
+import matlab.unittest.fixtures.PathFixture;
+import matlab.unittest.constraints.EndsWithSubstring;
+import matlab.unittest.constraints.ContainsSubstring;
+
+osqp_src_path = "@osqp-matlab_SOURCE_DIR@";
+unittest_dir = fullfile(osqp_src_path, 'unittests');
+suiteFolder = TestSuite.fromFolder(unittest_dir);
+
+% Exclude tests that contain codegen in the name
+suiteNoCodegen = selectIf(suiteFolder,~HasName(ContainsSubstring('codegen','IgnoringCase',true)));
+
+% Run all suite
+result = run(suiteNoCodegen);
+
+% Print test results
+disp(table(result))
+
+% Return error code if test failed
+assertSuccess(result)

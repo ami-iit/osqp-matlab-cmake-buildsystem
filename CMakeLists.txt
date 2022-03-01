@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 set(OSQP_MATLAB_UPSTREAM_VERSION 0.6.2)
-set(OSQP_MATLAB_CMAKE_REVISION 1)
+set(OSQP_MATLAB_CMAKE_REVISION 2)
 set(OSQP_MATLAB_CMAKE_VERSION "${OSQP_MATLAB_UPSTREAM_VERSION}.${OSQP_MATLAB_CMAKE_REVISION}")
 project(osqp-matlab-cmake-buildsystem
   LANGUAGES C CXX
@@ -19,6 +19,11 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
 option(BUILD_SHARED_LIBS "Build libraries as shared as opposed to static" ON)
 option(OSQP_MATLAB_USES_MATLAB "Do you want to create the MATLAB bindings" ON)
 option(OSQP_MATLAB_USES_OCTAVE "Do you want to create the Octave bindings" OFF)
+
+option(BUILD_TESTING "Create tests using CMake" OFF)
+if(BUILD_TESTING)
+  enable_testing()
+endif()
 
 set(OSQP_MATLAB_INSTALL_MATLAB_LIBDIR "mex" CACHE
     STRING "Location (relative to the install prefix) in which the Matlab mex libraries are installed.")
@@ -60,7 +65,7 @@ FetchContent_Declare(
   osqp-matlab
   GIT_REPOSITORY https://github.com/traversaro/osqp-matlab
 # GIT_TAG        v${OSQP_MATLAB_UPSTREAM_VERSION}
-  GIT_TAG        aff21017e4396aed8cf7537a14fe540ae5b0c374
+  GIT_TAG        09faf01f42f7a73fac0b03332e6b0f6976a943c8
   )
 
 FetchContent_MakeAvailable(osqp-matlab)
@@ -73,7 +78,8 @@ set(M_FILES ${osqp-matlab_SOURCE_DIR}/osqp.m)
 set(MEX_FILES ${osqp-matlab_SOURCE_DIR}/osqp_mex.hpp ${osqp-matlab_SOURCE_DIR}/osqp_mex.cpp)
 
 if(OSQP_MATLAB_USES_MATLAB)
-  find_package(Matlab REQUIRED)
+  find_package(Matlab REQUIRED
+               COMPONENTS MAIN_PROGRAM)
   matlab_add_mex(
       NAME osqp_mex_matlab
       OUTPUT_NAME osqp_mex
@@ -89,6 +95,15 @@ if(OSQP_MATLAB_USES_MATLAB)
   install(
     FILES ${M_FILES}
     DESTINATION ${OSQP_MATLAB_INSTALL_MATLAB_MFILESDIR})
+
+    # Enable tests
+    if (BUILD_TESTING)
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run_osqp_tests_no_codegen.m.in ${CMAKE_CURRENT_BINARY_DIR}/run_osqp_tests_no_codegen.m @ONLY)
+      # Note: this only works if the project was installed in the correct location and can be found with MATLABPATH
+      add_test(NAME matlab_osqp_tests
+           COMMAND ${Matlab_MAIN_PROGRAM} -nodisplay -nodesktop -nojvm -batch "addpath('${CMAKE_CURRENT_BINARY_DIR}');run_osqp_tests_no_codegen;")
+
+    endif()
 endif()
 
 if(OSQP_MATLAB_USES_OCTAVE)
@@ -115,5 +130,6 @@ if(OSQP_MATLAB_USES_OCTAVE)
     FILES ${M_FILES}
     DESTINATION ${OSQP_MATLAB_INSTALL_OCTAVE_MFILESDIR})
 endif()
+
 
 include(AddUninstallTarget)
