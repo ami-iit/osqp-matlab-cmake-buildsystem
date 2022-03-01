@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 set(OSQP_MATLAB_UPSTREAM_VERSION 0.6.2)
-set(OSQP_MATLAB_CMAKE_REVISION 1)
+set(OSQP_MATLAB_CMAKE_REVISION 2)
 set(OSQP_MATLAB_CMAKE_VERSION "${OSQP_MATLAB_UPSTREAM_VERSION}.${OSQP_MATLAB_CMAKE_REVISION}")
 project(osqp-matlab-cmake-buildsystem
   LANGUAGES C CXX
@@ -65,7 +65,7 @@ FetchContent_Declare(
   osqp-matlab
   GIT_REPOSITORY https://github.com/traversaro/osqp-matlab
 # GIT_TAG        v${OSQP_MATLAB_UPSTREAM_VERSION}
-  GIT_TAG        aff21017e4396aed8cf7537a14fe540ae5b0c374
+  GIT_TAG        09faf01f42f7a73fac0b03332e6b0f6976a943c8
   )
 
 FetchContent_MakeAvailable(osqp-matlab)
