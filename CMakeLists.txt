@@ -20,6 +20,11 @@ option(BUILD_SHARED_LIBS "Build libraries as shared as opposed to static" ON)
 option(OSQP_MATLAB_USES_MATLAB "Do you want to create the MATLAB bindings" ON)
 option(OSQP_MATLAB_USES_OCTAVE "Do you want to create the Octave bindings" OFF)
 
+option(BUILD_TESTING "Create tests using CMake" OFF)
+if(BUILD_TESTING)
+  enable_testing()
+endif()
+
 set(OSQP_MATLAB_INSTALL_MATLAB_LIBDIR "mex" CACHE
     STRING "Location (relative to the install prefix) in which the Matlab mex libraries are installed.")
 set(OSQP_MATLAB_INSTALL_MATLAB_MFILESDIR "mex" CACHE
@@ -73,7 +78,8 @@ set(M_FILES ${osqp-matlab_SOURCE_DIR}/osqp.m)
 set(MEX_FILES ${osqp-matlab_SOURCE_DIR}/osqp_mex.hpp ${osqp-matlab_SOURCE_DIR}/osqp_mex.cpp)
 
 if(OSQP_MATLAB_USES_MATLAB)
-  find_package(Matlab REQUIRED)
+  find_package(Matlab REQUIRED
+               COMPONENTS MAIN_PROGRAM)
   matlab_add_mex(
       NAME osqp_mex_matlab
       OUTPUT_NAME osqp_mex
@@ -89,6 +95,15 @@ if(OSQP_MATLAB_USES_MATLAB)
   install(
     FILES ${M_FILES}
     DESTINATION ${OSQP_MATLAB_INSTALL_MATLAB_MFILESDIR})
+
+    # Enable tests
+    if (BUILD_TESTING)
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run_osqp_tests_no_codegen.m.in ${CMAKE_CURRENT_BINARY_DIR}/run_osqp_tests_no_codegen.m @ONLY)
+      # Note: this only works if the project was installed in the correct location and can be found with MATLABPATH
+      add_test(NAME matlab_osqp_tests
+           COMMAND ${Matlab_MAIN_PROGRAM} -nodisplay -nodesktop -nojvm -batch "addpath('${CMAKE_CURRENT_BINARY_DIR}');run_osqp_tests_no_codegen;")
+
+    endif()
 endif()
 
 if(OSQP_MATLAB_USES_OCTAVE)
@@ -115,5 +130,6 @@ if(OSQP_MATLAB_USES_OCTAVE)
     FILES ${M_FILES}
     DESTINATION ${OSQP_MATLAB_INSTALL_OCTAVE_MFILESDIR})
 endif()
+
 
 include(AddUninstallTarget)
