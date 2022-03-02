@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 set(OSQP_MATLAB_UPSTREAM_VERSION 0.6.2)
-set(OSQP_MATLAB_CMAKE_REVISION 2)
+set(OSQP_MATLAB_CMAKE_REVISION 3)
 set(OSQP_MATLAB_CMAKE_VERSION "${OSQP_MATLAB_UPSTREAM_VERSION}.${OSQP_MATLAB_CMAKE_REVISION}")
 project(osqp-matlab-cmake-buildsystem
   LANGUAGES C CXX
@@ -78,8 +78,7 @@ set(M_FILES ${osqp-matlab_SOURCE_DIR}/osqp.m)
 set(MEX_FILES ${osqp-matlab_SOURCE_DIR}/osqp_mex.hpp ${osqp-matlab_SOURCE_DIR}/osqp_mex.cpp)
 
 if(OSQP_MATLAB_USES_MATLAB)
-  find_package(Matlab REQUIRED
-               COMPONENTS MAIN_PROGRAM)
+  find_package(Matlab REQUIRED)
   matlab_add_mex(
       NAME osqp_mex_matlab
       OUTPUT_NAME osqp_mex
@@ -98,6 +97,8 @@ if(OSQP_MATLAB_USES_MATLAB)
 
     # Enable tests
     if (BUILD_TESTING)
+      find_package(Matlab REQUIRED
+               COMPONENTS MAIN_PROGRAM)
       configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run_osqp_tests_no_codegen.m.in ${CMAKE_CURRENT_BINARY_DIR}/run_osqp_tests_no_codegen.m @ONLY)
       # Note: this only works if the project was installed in the correct location and can be found with MATLABPATH
       add_test(NAME matlab_osqp_tests
