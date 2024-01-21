@@ -79,12 +79,20 @@ set(MEX_FILES ${osqp-matlab_SOURCE_DIR}/osqp_mex.hpp ${osqp-matlab_SOURCE_DIR}/o
 
 if(OSQP_MATLAB_USES_MATLAB)
   find_package(Matlab REQUIRED)
-  matlab_add_mex(
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.24")
+    matlab_add_mex(
       NAME osqp_mex_matlab
       OUTPUT_NAME osqp_mex
       SRC ${MEX_FILES}
       NO_IMPLICIT_LINK_TO_MATLAB_LIBRARIES
       LINK_TO ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY} qdldl::qdldl osqp::osqp)
+  else()
+    matlab_add_mex(
+      NAME osqp_mex_matlab
+      OUTPUT_NAME osqp_mex
+      SRC ${MEX_FILES}
+      LINK_TO ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY} qdldl::qdldl osqp::osqp)
+  endif()
   # Workaround for missing include https://github.com/oxfordcontrol/osqp-matlab/issues/27
   target_include_directories(osqp_mex_matlab PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/workaround_include)
   install(
