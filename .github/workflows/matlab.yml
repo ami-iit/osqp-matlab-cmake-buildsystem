@@ -75,7 +75,7 @@ jobs:
     - name: Print used environment [Conda]
       shell: bash -l {0}
       run: |
-        mamba list
+        conda list
         env
 
     - name: Configure [Conda - Linux or  macOS]
