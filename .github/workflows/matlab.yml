@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         build_type: [Release]
-        os: [ubuntu-24.04, windows-latest, macos-latest]
+        os: [ubuntu-24.04, windows-latest]
         matlab_version: [R2023b, R2024a, latest]
 
     steps:
