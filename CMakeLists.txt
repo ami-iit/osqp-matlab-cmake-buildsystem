@@ -62,13 +62,14 @@ find_package(osqp REQUIRED)
 # the FetchContent* commands and set manually osqp-matlab_SOURCE_DIR
 include(FetchContent)
 # Temporary pointing to a commit as osqp-matlab v1.0.0 was never released
-# furthermore we need also the fix https://github.com/osqp/osqp-matlab/pull/61
-# to avoid that a buffer allocate by the system allocator (inside osqp) is delete by the matlab allocator (inside osqp-matlab)
+# furthermore we need also the fixes:
+#  * https://github.com/osqp/osqp-matlab/pull/61, to avoid that a buffer allocate by the system allocator (inside osqp) is delete by the matlab allocator (inside osqp-matlab)
+#  * https://github.com/osqp/osqp-matlab/pull/62
 FetchContent_Declare(
   osqp-matlab
   GIT_REPOSITORY https://github.com/traversaro/osqp-matlab
 # GIT_TAG        v${OSQP_MATLAB_UPSTREAM_VERSION}
-  GIT_TAG        1ffc03140394e11792ee30db86f6ceac9d8a4d3f
+  GIT_TAG        f41846a2a461839bd4e76c3ed93bfcf0459b0d69
   )
 
 FetchContent_MakeAvailable(osqp-matlab)
