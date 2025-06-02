@@ -23,15 +23,7 @@ jobs:
       matrix:
         build_type: [Release]
         os: [ubuntu-24.04, windows-latest, macos-latest]
-        matlab_version: [R2020a, R2020b, R2021a, latest]
-        exclude:
-          # R2020* is not supported on Windows on GitHub Actions
-          - os: windows-latest
-            matlab_version: R2020a
-            build_type: Release
-          - os: windows-latest
-            matlab_version: R2020b
-            build_type: Release
+        matlab_version: [R2024a, R2024b, latest]
 
     steps:
     - uses: actions/checkout@v2
