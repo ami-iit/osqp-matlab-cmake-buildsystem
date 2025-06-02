@@ -82,6 +82,11 @@ file(GLOB MEX_FILES
     "${osqp-matlab_SOURCE_DIR}/c_sources/*.cpp"
 )
 
+# The interrupt_matlab.c is used to customize the osqp library to support
+# being interrupted from matlab, that we can't do here as we do not recompile osqp
+list(REMOVE_ITEM MEX_FILES
+     "${osqp-matlab_SOURCE_DIR}/c_sources/interrupt_matlab.c")
+
 if(OSQP_MATLAB_USES_MATLAB)
   find_package(Matlab REQUIRED)
   if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.24")
