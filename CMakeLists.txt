@@ -3,8 +3,9 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-set(OSQP_MATLAB_UPSTREAM_VERSION 0.6.2)
-set(OSQP_MATLAB_CMAKE_REVISION 5)
+# osqp-matlab 0.9.0 does not exists, but we use it as osqp-matlab 1.0.0 was never released 
+set(OSQP_MATLAB_UPSTREAM_VERSION 0.9.0)
+set(OSQP_MATLAB_CMAKE_REVISION 0)
 set(OSQP_MATLAB_CMAKE_VERSION "${OSQP_MATLAB_UPSTREAM_VERSION}.${OSQP_MATLAB_CMAKE_REVISION}")
 project(osqp-matlab-cmake-buildsystem
   LANGUAGES C CXX
@@ -60,12 +61,12 @@ find_package(osqp REQUIRED)
 ## To use with some the osqp-matlab source coming from some other source, comment out
 # the FetchContent* commands and set manually osqp-matlab_SOURCE_DIR
 include(FetchContent)
-# Temporary pointing to a fork, see https://github.com/oxfordcontrol/osqp-matlab/pull/34
+# Temporary pointing to a commit as osqp-matlab v1.0.0 was never released
 FetchContent_Declare(
   osqp-matlab
-  GIT_REPOSITORY https://github.com/traversaro/osqp-matlab
+  GIT_REPOSITORY https://github.com/osqp/osqp-matlab
 # GIT_TAG        v${OSQP_MATLAB_UPSTREAM_VERSION}
-  GIT_TAG        09faf01f42f7a73fac0b03332e6b0f6976a943c8
+  GIT_TAG        fa9547d72325399a3e746a46fdaa9ac43e8b7b4d
   )
 
 FetchContent_MakeAvailable(osqp-matlab)
@@ -74,8 +75,12 @@ FetchContent_MakeAvailable(osqp-matlab)
 file(DOWNLOAD "https://raw.githubusercontent.com/oxfordcontrol/osqp/v${OSQP_MATLAB_UPSTREAM_VERSION}/lin_sys/direct/qdldl/qdldl_interface.h" ${CMAKE_CURRENT_BINARY_DIR}/workaround_include/qdldl_interface.h)
 
 # Common source files
-set(M_FILES ${osqp-matlab_SOURCE_DIR}/osqp.m)
-set(MEX_FILES ${osqp-matlab_SOURCE_DIR}/osqp_mex.hpp ${osqp-matlab_SOURCE_DIR}/osqp_mex.cpp)
+file(GLOB MEX_FILES
+    "${osqp-matlab_SOURCE_DIR}/c_sources/*.h"
+    "${osqp-matlab_SOURCE_DIR}/c_sources/*.c"
+    "${osqp-matlab_SOURCE_DIR}/c_sources/*.hpp"
+    "${osqp-matlab_SOURCE_DIR}/c_sources/*.cpp"
+)
 
 if(OSQP_MATLAB_USES_MATLAB)
   find_package(Matlab REQUIRED)
@@ -100,7 +105,7 @@ if(OSQP_MATLAB_USES_MATLAB)
     EXPORT ${PROJECT_NAME}
     DESTINATION ${OSQP_MATLAB_INSTALL_MATLAB_LIBDIR})
   install(
-    FILES ${M_FILES}
+    DIRECTORY ${osqp-matlab_SOURCE_DIR}/@osqp
     DESTINATION ${OSQP_MATLAB_INSTALL_MATLAB_MFILESDIR})
 
     # Enable tests
@@ -136,7 +141,7 @@ if(OSQP_MATLAB_USES_OCTAVE)
     EXPORT ${PROJECT_NAME}
     DESTINATION ${OSQP_MATLAB_INSTALL_OCTAVE_LIBDIR})
   install(
-    FILES ${M_FILES}
+    DIRECTORY ${osqp-matlab_SOURCE_DIR}/@osqp
     DESTINATION ${OSQP_MATLAB_INSTALL_OCTAVE_MFILESDIR})
 endif()
 
