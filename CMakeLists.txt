@@ -68,7 +68,7 @@ FetchContent_Declare(
   osqp-matlab
   GIT_REPOSITORY https://github.com/traversaro/osqp-matlab
 # GIT_TAG        v${OSQP_MATLAB_UPSTREAM_VERSION}
-  GIT_TAG        4701bb8410302173e99b1ac74a4451c3dfdd7c52
+  GIT_TAG        0470195877879487891acae68a14503c5a52b8f5
   )
 
 FetchContent_MakeAvailable(osqp-matlab)
