@@ -47,12 +47,6 @@ jobs:
       with:
         release: ${{ matrix.matlab_version }}
 
-    # workaround for https://github.com/robotology/robotology-superbuild/issues/64
-    - name: Do not use MATLAB's stdc++ to avoid incompatibilities with other libraries
-      if: contains(matrix.os, 'ubuntu')
-      run:
-          echo 'LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6' >> $GITHUB_ENV
-
     - name: Dependencies
       run: |
         # Workaround for https://github.com/conda-incubator/setup-miniconda/issues/186
@@ -101,6 +95,12 @@ jobs:
       run: |
         cd build
         cmake --install . --config ${{ matrix.build_type }}
+
+    # workaround for https://github.com/robotology/robotology-superbuild/issues/64
+    - name: Do not use MATLAB's stdc++ to avoid incompatibilities with other libraries
+      if: contains(matrix.os, 'ubuntu')
+      run:
+          echo 'LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6' >> $GITHUB_ENV
 
     - name: Test
       run: |
