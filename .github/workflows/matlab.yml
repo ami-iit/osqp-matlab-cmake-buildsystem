@@ -2,9 +2,9 @@ name: MATLAB Tests CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, v1 ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, v1 ]
   workflow_dispatch:
   schedule:
   # * is a special character in YAML so you have to quote this string
