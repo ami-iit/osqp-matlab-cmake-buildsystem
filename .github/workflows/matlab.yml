@@ -69,7 +69,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake  -GNinja -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX}/Library -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_TESTING:BOOL=ON ..
+        cmake  -GNinja -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX%\Library -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_TESTING:BOOL=ON ..
 
     - name: Build [Conda - Linux or  macOS]
       if: contains(matrix.os, 'macos') || contains(matrix.os, 'ubuntu')
