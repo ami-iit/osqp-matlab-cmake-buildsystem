@@ -50,4 +50,5 @@ Materials in this repository are distributed under the following license:
 
 The version of this `CMake` project is chosen in accordance of the original project, plus a fourth version that describes if several CMake buildsystem
 versions were released, for example the version `x.y.z.t` is the one corresponding to the `x.y.z` version of osqp-matlab, while `t` is the number that can be
-increased if changes are done to the CMake buildsystem.
+increased if changes are done to the CMake buildsystem. An exeception was done for `osqp` 1.0.0, that was initially released without a corresponding `osqp-matlab` version,
+so a `osqp` 1.0.0-compatible version was released under the `0.9.*` version number.
