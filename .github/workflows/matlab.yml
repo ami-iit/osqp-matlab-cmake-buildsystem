@@ -22,23 +22,15 @@ jobs:
       fail-fast: false
       matrix:
         build_type: [Release]
-        os: [ubuntu-22.04, windows-2019, macos-latest]
-        matlab_version: [R2020a, R2020b, R2021a, latest]
-        exclude:
-          # R2020* is not supported on Windows on GitHub Actions
-          - os: windows-2019
-            matlab_version: R2020a
-            build_type: Release
-          - os: windows-2019
-            matlab_version: R2020b
-            build_type: Release
+        os: [ubuntu-24.04, windows-latest]
+        matlab_version: [R2023b, R2024a, latest]
 
     steps:
     - uses: actions/checkout@v2
 
-    - uses: conda-incubator/setup-miniconda@v2
+    - uses: conda-incubator/setup-miniconda@v3
       with:
-        miniforge-variant: Mambaforge
+        miniforge-variant: Miniforge3
         miniforge-version: latest
         channels: conda-forge,robotology
 
@@ -47,35 +39,21 @@ jobs:
       with:
         release: ${{ matrix.matlab_version }}
 
-    # workaround for https://github.com/robotology/robotology-superbuild/issues/64
-    - name: Do not use MATLAB's stdc++ to avoid incompatibilities with other libraries
-      if: contains(matrix.os, 'ubuntu')
-      run:
-          echo 'LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6' >> $GITHUB_ENV
-
     - name: Dependencies
       run: |
         # Workaround for https://github.com/conda-incubator/setup-miniconda/issues/186
         conda config --remove channels defaults
         # Compilation related dependencies 
-        mamba install cmake compilers make ninja pkg-config
+        conda install cmake cxx-compiler make ninja pkg-config
         # Actual dependencies
-        mamba install osqp
+        conda install libosqp
         # Just a trick to make sure that the relevant installation path are on MATLABPATH
-        mamba install -c conda-forge -c robotology idyntree-matlab-bindings
-
-    # Additional dependencies useful only on Windows
-    - name: Dependencies [Conda/Windows]
-      if: contains(matrix.os, 'windows') 
-      run: |
-        # Additional dependencies only useful on Windows
-        # See https://github.com/robotology/robotology-superbuild/issues/477
-        mamba install vs2019_win-64
+        conda install -c conda-forge -c robotology idyntree-matlab-bindings
 
     - name: Print used environment [Conda]
       shell: bash -l {0}
       run: |
-        mamba list
+        conda list
         env
 
     - name: Configure [Conda - Linux or  macOS]
@@ -87,12 +65,21 @@ jobs:
 
     - name: Configure [Conda - Windows]
       if: contains(matrix.os, 'windows')
+      shell: cmd /C CALL {0}
       run: |
         mkdir build
         cd build
-        cmake  -G"Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX}/Library -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_TESTING:BOOL=ON ..
+        cmake  -GNinja -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX%\Library -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_TESTING:BOOL=ON ..
 
-    - name: Build
+    - name: Build [Conda - Linux or  macOS]
+      if: contains(matrix.os, 'macos') || contains(matrix.os, 'ubuntu')
+      run: |
+        cd build
+        cmake --build . --config ${{ matrix.build_type }}
+
+    - name: Build [Conda - Windows]
+      if: contains(matrix.os, 'windows')
+      shell: cmd /C CALL {0}
       run: |
         cd build
         cmake --build . --config ${{ matrix.build_type }}
@@ -101,6 +88,12 @@ jobs:
       run: |
         cd build
         cmake --install . --config ${{ matrix.build_type }}
+
+    # workaround for https://github.com/robotology/robotology-superbuild/issues/64
+    - name: Do not use MATLAB's stdc++ to avoid incompatibilities with other libraries
+      if: contains(matrix.os, 'ubuntu')
+      run:
+          echo 'LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6' >> $GITHUB_ENV
 
     - name: Test
       run: |
