@@ -46,8 +46,6 @@ jobs:
         conda config --remove channels defaults
         # Compilation related dependencies 
         conda install cmake cxx-compiler make ninja pkg-config
-        # Just a trick to make sure that the relevant installation path are on MATLABPATH
-        conda install -c conda-forge -c robotology idyntree-matlab-bindings
 
     - name: Install osqp (conda-forge)
       if: contains(matrix.osqp_type, 'conda')
@@ -121,9 +119,18 @@ jobs:
       run:
           echo 'LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6' >> $GITHUB_ENV
 
-    - name: Test
+    - name: Test - Windows
+      if: contains(matrix.os, 'windows')
+      shell: bash -l {0}
       run: |
         cd build
+        export MATLABPATH=$CONDA_PREFIX/Library/mex
         ctest --output-on-failure -C ${{ matrix.build_type }} -VV . 
 
-
+    - name: Test - Linux/macOS
+      if: contains(matrix.os, 'macos') || contains(matrix.os, 'ubuntu')
+      shell: bash -l {0}
+      run: |
+        cd build
+        export MATLABPATH=$CONDA_PREFIX/mex
+        ctest --output-on-failure -C ${{ matrix.build_type }} -VV . 
