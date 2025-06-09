@@ -22,6 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         build_type: [Release]
+        osqp_type: [conda-forge, manual-compilation]
         os: [ubuntu-24.04, windows-latest]
         matlab_version: [R2023b, R2024a, latest]
 
@@ -45,10 +46,35 @@ jobs:
         conda config --remove channels defaults
         # Compilation related dependencies 
         conda install cmake cxx-compiler make ninja pkg-config
-        # Actual dependencies
-        conda install libosqp
         # Just a trick to make sure that the relevant installation path are on MATLABPATH
         conda install -c conda-forge -c robotology idyntree-matlab-bindings
+
+    - name: Install osqp (conda-forge)
+      if: contains(matrix.osqp_type, 'conda')
+      run: |
+        conda install libosqp
+
+    - name: Install osqp (manual-compilation, Linux/macOS)
+      if: contains(matrix.osqp_type, 'manual') && (contains(matrix.os, 'macos') || contains(matrix.os, 'ubuntu'))
+      shell: bash -l {0}
+      run: |
+        git clone https://github.com/osqp/osqp -b v1.0.0
+        cd osqp
+        mkdir build
+        cd build
+        cmake -GNinja -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DOSQP_BUILD_STATIC_LIB:BOOL=OFF -DQDLDL_BUILD_STATIC_LIB:BOOL=OFF -DBUILD_TESTING:BOOL=OFF ..
+        ninja install
+
+    - name: Install osqp (manual-compilation, Windows)
+      if: contains(matrix.osqp_type, 'manual') && contains(matrix.os, 'windows')
+      shell: cmd /C CALL {0}
+      run: |
+        git clone https://github.com/osqp/osqp -b v1.0.0
+        cd osqp
+        mkdir build
+        cd build
+        cmake -GNinja -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX%\Library -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DOSQP_BUILD_STATIC_LIB:BOOL=OFF -DQDLDL_BUILD_STATIC_LIB:BOOL=OFF -DBUILD_TESTING:BOOL=OFF ..
+        ninja install
 
     - name: Print used environment [Conda]
       shell: bash -l {0}
