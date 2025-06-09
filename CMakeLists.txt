@@ -3,9 +3,9 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-# osqp-matlab 0.9.1 does not exists, but we use it as osqp-matlab 1.0.0 was never released 
-set(OSQP_MATLAB_UPSTREAM_VERSION 0.9.1)
-set(OSQP_MATLAB_CMAKE_REVISION 0)
+# osqp-matlab 0.9.0 does not exists, but we use it as osqp-matlab 1.0.0 was never released 
+set(OSQP_MATLAB_UPSTREAM_VERSION 0.9.0)
+set(OSQP_MATLAB_CMAKE_REVISION 1)
 set(OSQP_MATLAB_CMAKE_VERSION "${OSQP_MATLAB_UPSTREAM_VERSION}.${OSQP_MATLAB_CMAKE_REVISION}")
 project(osqp-matlab-cmake-buildsystem
   LANGUAGES C CXX
