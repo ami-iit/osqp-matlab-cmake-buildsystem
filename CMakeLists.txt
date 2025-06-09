@@ -53,8 +53,7 @@ if(NOT CMAKE_CONFIGURATION_TYPES)
   endif()
 endif()
 
-## Find qdldl and osqp dependency
-find_package(qdldl REQUIRED)
+## Find osqp dependency
 find_package(osqp REQUIRED)
 
 ## Clone osqp-matlab repository
@@ -73,9 +72,6 @@ FetchContent_Declare(
   )
 
 FetchContent_MakeAvailable(osqp-matlab)
-
-# Workaround for missing include https://github.com/oxfordcontrol/osqp-matlab/issues/27
-file(DOWNLOAD "https://raw.githubusercontent.com/oxfordcontrol/osqp/v${OSQP_MATLAB_UPSTREAM_VERSION}/lin_sys/direct/qdldl/qdldl_interface.h" ${CMAKE_CURRENT_BINARY_DIR}/workaround_include/qdldl_interface.h)
 
 # Common source files
 file(GLOB MEX_FILES
@@ -98,16 +94,14 @@ if(OSQP_MATLAB_USES_MATLAB)
       OUTPUT_NAME osqp_mex
       SRC ${MEX_FILES}
       NO_IMPLICIT_LINK_TO_MATLAB_LIBRARIES
-      LINK_TO ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY} qdldl::qdldl osqp::osqp)
+      LINK_TO ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY} osqp::osqp)
   else()
     matlab_add_mex(
       NAME osqp_mex_matlab
       OUTPUT_NAME osqp_mex
       SRC ${MEX_FILES}
-      LINK_TO ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY} qdldl::qdldl osqp::osqp)
+      LINK_TO ${Matlab_MEX_LIBRARY} ${Matlab_MX_LIBRARY} osqp::osqp)
   endif()
-  # Workaround for missing include https://github.com/oxfordcontrol/osqp-matlab/issues/27
-  target_include_directories(osqp_mex_matlab PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/workaround_include)
   install(
     TARGETS osqp_mex_matlab
     EXPORT ${PROJECT_NAME}
@@ -134,7 +128,7 @@ if(OSQP_MATLAB_USES_OCTAVE)
   add_library(osqp_mex_octave MODULE  ${MEX_FILES})
   set_target_properties(osqp_mex_octave PROPERTIES DEBUG_POSTFIX "")
   target_include_directories(osqp_mex_octave PUBLIC ${OCTAVE_INCLUDE_DIRS})
-  target_link_libraries(osqp_mex_octave ${OCTAVE_LIBRARIES} qdldl::qdldl osqp::osqp)
+  target_link_libraries(osqp_mex_octave ${OCTAVE_LIBRARIES} osqp::osqp)
   if(APPLE)
     set_target_properties(osqp_mex_octave PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
   endif()
@@ -142,8 +136,6 @@ if(OSQP_MATLAB_USES_OCTAVE)
     PROPERTIES OUTPUT_NAME osqp_mex
                PREFIX ""
                SUFFIX .mex)
-  # Workaround for missing include https://github.com/oxfordcontrol/osqp-matlab/issues/27
-  target_include_directories(osqp_mex_octave PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/workaround_include)
   install(
     TARGETS osqp_mex_octave
     EXPORT ${PROJECT_NAME}
