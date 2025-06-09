@@ -67,8 +67,10 @@ jobs:
       if: contains(matrix.osqp_type, 'manual') && contains(matrix.os, 'windows')
       shell: cmd /C CALL {0}
       run: |
-        git clone https://github.com/osqp/osqp -b v1.0.0
+        # Specific commit and not tag as workaround for https://github.com/osqp/osqp/pull/744
+        git clone https://github.com/osqp/osqp
         cd osqp
+        git checkout 721a5650e10c763d07c79bef207bdb1112875798
         mkdir build
         cd build
         cmake -GNinja -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX%\Library -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DOSQP_BUILD_STATIC_LIB:BOOL=OFF -DQDLDL_BUILD_STATIC_LIB:BOOL=OFF -DBUILD_TESTING:BOOL=OFF ..
